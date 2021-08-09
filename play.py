@@ -3,8 +3,8 @@ from players import mat, strats, strats_table, players, selection, all_against_a
 import matplotlib.pyplot as plt
 
 for r in range(50):
-    all_against_all(5)
-    players = selection(players, 0.2)
+    all_against_random(5, 5)
+    players = selection(players, 0.05)
 
 for s in strats_table:
     plt.plot(strats_table[s], label=s)

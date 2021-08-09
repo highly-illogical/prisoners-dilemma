@@ -2,10 +2,10 @@ from prisoner import Strategy, playPD
 import random
 
 strats = {
-    "0000": 0,
-    "0101": 20,
-    "1010": 5,
-    "1111": 5
+    "0000": 50,
+    "0101": 50,
+    "1010": 50,
+    "1111": 50
 }
 
 strats_table = {
