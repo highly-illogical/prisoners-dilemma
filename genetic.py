@@ -1,40 +1,64 @@
 from random import randint
 
-pool = []
-f = []
+class Genetic:
+    pool = []
+    fitness = []
 
-for i in range(100):
-    pool.append("".join(chr(97 + randint(0, 25)) for j in range(20)))
+    # Initializes pool with n strings
+    def __init__(self, num=10, length=10):     
+        for i in range(num):
+            self.pool.append(self.generate(length))
 
-def fitness(s):
-    return sum(ord(c) for c in s)
+    # Generates a random string of length n
+    def generate(self, n):
+        return "".join(chr(97 + randint(0, 25)) for j in range(n))
 
-def crossover(s, t, i):
-    snew = s[:i] + t[i:]
-    tnew = t[:i] + s[i:]
-    return [snew, tnew]
+    # Calculates fitness of each string and saves in array
+    def calc_fitness(self):
+        self.fitness = [self.fitness_func(s) for s in self.pool]
 
-def mutate(s, n):
-    snew = [c for c in s]
-    for i in range(n):
-        k = randint(0, len(snew) - 1)
-        snew[k] = chr(97 + randint(0, 25))
-    return "".join(snew)
+    # Sorts strings in pool by a given array
+    def sort_pool_by(self, arr):
+        self.pool = [s for _, s in sorted(zip(arr, self.pool))]
 
-def calc_fitness(pool):
-    return [fitness(s) for s in pool]
+    # Replaces bottom n strings in pool with top n strings
+    def select_top(self, n):
+        self.pool[-n:] = self.pool[:n]
 
-def sort_by(a, b):
-    return [s for _, s in sorted(zip(a, b))]
+    # Fitness function
+    def fitness_func(self, s):
+        return sum(ord(c) for c in s)
 
-for i in range(5000):
-    f = calc_fitness(pool)
-    pool = sort_by(f, pool)
-    pool[-5:] = pool[:5]
-    r = [randint(1, 1000) for j in range(100)]
-    pool = sort_by(r, pool)
-    for j in range(0, 100, 2):
-        pool[j] = mutate(pool[j], 1)
-        pool[j], pool[j+1] = crossover(pool[j], pool[j+1], 10)
+    # Crossover between two strings in pool
+    def crossover(self, m, n, i=0):
+        snew = self.pool[m][:i] + self.pool[n][i:]
+        tnew = self.pool[n][:i] + self.pool[m][i:]
+        self.pool[m] = snew
+        self.pool[n] = tnew
 
-print(pool[:10])
+    # Mutates string at index j by n characters
+    def mutate(self, j, n=1):
+        snew = [c for c in self.pool[j]]
+        for i in range(n):
+            k = randint(0, len(snew) - 1)
+            snew[k] = chr(97 + randint(0, 25))
+        self.pool[j] = "".join(snew)
+
+    # Allows pool to evolve for a fixed number of generations
+    def evolve(self, gen=100, mutations=1, top=5):
+        for i in range(gen):
+            for j in range(0, len(self.pool), 4):
+                self.mutate(j, mutations)
+            for j in range(0, len(self.pool), 2):
+                self.crossover(j, j+1, len(self.pool) // 2)
+            self.calc_fitness()
+            self.sort_pool_by(self.fitness)
+            self.pool.reverse()
+            self.select_top(top)
+            r = [randint(1, 1000) for j in range(len(self.pool))]
+            self.sort_pool_by(r)
+
+alphabet = Genetic(100, 20)
+alphabet.evolve(100)
+
+print(alphabet.pool[:10])
