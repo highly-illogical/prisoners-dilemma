@@ -13,6 +13,10 @@ class Genetic:
     def generate(self, n):
         return "".join(chr(97 + randint(0, 25)) for j in range(n))
 
+    # Returns nth string in pool
+    def string(self, n):
+        return self.pool[n]
+
     # Calculates fitness of each string and saves in array
     def calc_fitness(self):
         self.fitness = [self.fitness_func(s) for s in self.pool]
@@ -41,7 +45,7 @@ class Genetic:
         snew = [c for c in self.pool[j]]
         for i in range(n):
             k = randint(0, len(snew) - 1)
-            snew[k] = chr(97 + randint(0, 25))
+            snew[k] = self.generate(1)
         self.pool[j] = "".join(snew)
 
     # Allows pool to evolve for a fixed number of generations
@@ -58,7 +62,8 @@ class Genetic:
             r = [randint(1, 1000) for j in range(len(self.pool))]
             self.sort_pool_by(r)
 
-alphabet = Genetic(100, 20)
-alphabet.evolve(100)
+if __name__ == '__main__':
+    alphabet = Genetic(100, 20)
+    alphabet.evolve(100)
 
-print(alphabet.pool[:10])
+    print(alphabet.pool[:10])
